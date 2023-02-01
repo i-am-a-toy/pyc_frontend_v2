@@ -1,9 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:pyc/common/constants/constants.dart';
+import 'package:pyc/data/clients/client.dart';
+import 'package:pyc/data/providers/auth/auth_provider.dart';
+import 'package:pyc/data/repositories/auth/auth_repository.dart';
 import 'package:pyc/screens/index/index_screen.dart';
 import 'package:pyc/screens/login/login_screen.dart';
 
@@ -19,23 +20,18 @@ class _SplashScreenState extends State<SplashScreen> {
   /// initState
   ///
   /// Splash Screen에서 FlutterSecureStorage에 있는 Token을 확인 후 해당 토큰의
-  /// 유효성을 검증한다. TODO: Token이 존재하는 경우 Validation을 하여 유요한 토큰인지 확인
-  ///
   /// 토큰이 존재하고 검증에 통과할 경우 -> Index Screen
   /// 토큰이 존재하지 않거나 유효하지 않는 경우 -> Login Screen
   @override
   void initState() {
     super.initState();
+    final repo = Get.put(AuthRepository(provider: AuthProvider(client: DioClient())));
 
     const storage = FlutterSecureStorage();
     storage.read(key: 'token').then((token) {
-      if (token != null || token == '') {
-        log('AccessToken exists');
-        _goToScreen(IndexScreen.routeName);
-        return;
-      }
-      log('AccessToken not exists');
-      _goToScreen(LoginScreen.routeName);
+      return repo.validateToken(token);
+    }).then((resp) {
+      resp.isValid == true ? _goToScreen(IndexScreen.routeName) : _goToScreen(LoginScreen.routeName);
     });
   }
 

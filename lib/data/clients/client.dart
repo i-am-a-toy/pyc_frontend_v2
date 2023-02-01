@@ -8,7 +8,7 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:pyc/common/utils/get_snackbar.dart';
 import 'package:pyc/data/clients/client_interface.dart';
 import 'package:pyc/data/models/auth/requests/refresh_request.dart';
-import 'package:pyc/data/models/auth/responses/token_request.dart';
+import 'package:pyc/data/models/auth/responses/token_response.dart';
 import 'package:pyc/screens/login/login_screen.dart';
 
 class DioClient extends GetxService implements IClient<Dio> {
@@ -68,13 +68,13 @@ class DioClient extends GetxService implements IClient<Dio> {
                   if (e.response?.statusCode != HttpStatus.ok && e.response?.statusCode != HttpStatus.internalServerError) {
                     log('refresh Token is expired');
                     Get.offAllNamed(LoginScreen.routeName);
-                    showGetSnackBar('알림', '인증이 만료되어 로그인페이지로 이동합니다.');
+                    showGetXSnackBar('알림', '인증이 만료되어 로그인페이지로 이동합니다.');
                     return;
                   }
 
                   log('Fail refresh request with Error: ${e.response?.data}');
                   Get.offAllNamed(LoginScreen.routeName);
-                  showGetSnackBar('알림', '서버에 이상이 있습니다. 관리자에게 문의해주세요.');
+                  showGetXSnackBar('알림', '서버에 이상이 있습니다. 관리자에게 문의해주세요.');
                 },
               ),
             );

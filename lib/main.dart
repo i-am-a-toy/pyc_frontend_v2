@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:pyc/screens/route.dart';
 import 'package:pyc/screens/splash/splash_screen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
   runApp(const MyApp());
 }
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       getPages: routes,
-      home: const SplashScreen(),
+      initialRoute: SplashScreen.routeName,
     );
   }
 }

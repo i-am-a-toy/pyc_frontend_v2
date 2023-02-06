@@ -30,4 +30,15 @@ class AuthRepository extends GetxService implements IAuthRepository {
       return ValidationResponse(false);
     }
   }
+
+  @override
+  Future<ValidationResponse> validateMyToken() async {
+    try {
+      final response = await provider.validateMyToken();
+      return ValidationResponse.fromJSON(response.data);
+    } catch (e) {
+      log('Fail validate token with $e');
+      return ValidationResponse(false);
+    }
+  }
 }

@@ -16,4 +16,10 @@ class AuthProvider implements IAuthProvider {
       ),
     );
   }
+
+  @override
+  Future<Response> validateMyToken() async {
+    final authClient = await client.getAuthClient();
+    return authClient.get('/auth/token/validate');
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:pyc/common/constants/constants.dart';
+import 'package:pyc/common/utils/get_route.dart';
 import 'package:pyc/data/clients/client.dart';
 import 'package:pyc/data/providers/auth/auth_provider.dart';
 import 'package:pyc/data/repositories/auth/auth_repository.dart';
@@ -27,11 +27,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     final repo = Get.put(AuthRepository(provider: AuthProvider(client: DioClient())));
 
-    const storage = FlutterSecureStorage();
-    storage.read(key: 'token').then((token) {
-      return repo.validateToken(token);
-    }).then((resp) {
-      resp.isValid == true ? _goToScreen(IndexScreen.routeName) : _goToScreen(LoginScreen.routeName);
+    repo.validateMyToken().then((resp) {
+      resp.isValid == true ? goToOffAllNamedWithDelay(IndexScreen.routeName) : goToOffAllNamedWithDelay(LoginScreen.routeName);
     });
   }
 
@@ -68,16 +65,6 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  _goToScreen(String name) {
-    Future.delayed(
-      const Duration(milliseconds: 3000),
-    ).then(
-      (_) {
-        Get.offAllNamed(name);
-      },
     );
   }
 }

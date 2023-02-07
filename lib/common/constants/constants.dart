@@ -5,6 +5,8 @@ const kDefaultValue = 20.0;
 const Color kPrimaryColor = Color(0xff0C3D81);
 const Color kSecondaryColor = Color(0xffEDF1FD);
 const Color kThirdColor = Color(0xffADC2A9);
+const Color kPointColor = Color(0xff00EFDA);
+const Color kGreyTextColor = Color(0xff606060);
 
 const kDoubleHeightSizeBox = SizedBox(
   height: kDefaultValue * 2,

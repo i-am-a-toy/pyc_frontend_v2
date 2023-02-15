@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pyc/controllers/index/fetch_me_controller.dart';
 import 'package:pyc/data/clients/client.dart';
 import 'package:pyc/data/providers/user/user_provider.dart';
+import 'package:pyc/data/repositories/auth/auth_repository.dart';
 import 'package:pyc/data/repositories/user/user_repository.dart';
 
 class IndexBinding extends Bindings {
@@ -12,6 +13,11 @@ class IndexBinding extends Bindings {
         UserProvider(DioClient()),
       ),
     );
-    Get.put<FetchMeController>(FetchMeController(userRepository));
+    final authRepository = Get.find<AuthRepository>();
+
+    Get.put<FetchMeController>(FetchMeController(
+      userRepository,
+      authRepository,
+    ));
   }
 }

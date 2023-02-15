@@ -28,6 +28,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         backgroundColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+        ),
       ),
       getPages: routes,
       initialRoute: SplashScreen.routeName,

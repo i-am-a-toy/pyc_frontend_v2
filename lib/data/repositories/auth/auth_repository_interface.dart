@@ -5,4 +5,5 @@ abstract class IAuthRepository {
   Future<ValidationResponse> validateToken(String? token);
   Future<ValidationResponse> validateMyToken();
   Future<TokenResponse> login(String name, String password);
+  Future<void> logout();
 }

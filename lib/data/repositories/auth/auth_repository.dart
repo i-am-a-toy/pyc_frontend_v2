@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:pyc/data/models/auth/responses/token_response.dart';
 import 'package:pyc/data/models/common/responses/validation_response.dart';
@@ -51,5 +52,23 @@ class AuthRepository extends GetxService implements IAuthRepository {
   Future<TokenResponse> login(String name, String password) async {
     final response = await provider.login(name, password);
     return TokenResponse.fromJSON(response.data);
+  }
+
+  /// logout
+  ///
+  /// 현재 가지고있는 AuthToken을 이용하여 Logout을 진행한다.
+  /// 로그아웃의 성공 실패 여부와 관계 없이 현재 저장되어 있는 토큰을 전부 삭제한다.
+  @override
+  Future<void> logout() async {
+    try {
+      await provider.logout();
+      log('Success Logout');
+    } catch (e) {
+      log('Logout failed Check Your Logic.');
+    } finally {
+      const storage = FlutterSecureStorage();
+      await storage.deleteAll();
+      log('All tokens were deleted due to logout');
+    }
   }
 }

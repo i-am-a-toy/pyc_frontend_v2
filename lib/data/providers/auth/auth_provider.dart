@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:pyc/data/clients/client_interface.dart';
 import 'package:pyc/data/models/auth/requests/login_request.dart';
@@ -30,5 +28,11 @@ class AuthProvider implements IAuthProvider {
   Future<Response> login(String name, String password) {
     final req = LoginRequest(name, password);
     return client.getClient().post('/auth/login', data: req.toJson());
+  }
+
+  @override
+  Future<void> logout() async {
+    final authClient = await client.getAuthClient();
+    await authClient.delete('/auth/logout');
   }
 }

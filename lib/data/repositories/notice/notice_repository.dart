@@ -26,8 +26,8 @@ class NoticeRepository extends GetxService implements INoticeRepository {
   }
 
   @override
-  Future<void> modify(String title, String content) async {
-    await provider.write(title, content);
+  Future<void> modify(int id, String title, String content) async {
+    await provider.modify(id, title, content);
   }
 
   @override

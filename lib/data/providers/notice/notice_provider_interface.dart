@@ -9,7 +9,7 @@ abstract class INoticeProvider {
   Future<Response> findAll({int offset, int limit});
 
   // U
-  Future<void> modify(String title, String content);
+  Future<void> modify(int id, String title, String content);
 
   // D
   Future<void> deleteById(int id);

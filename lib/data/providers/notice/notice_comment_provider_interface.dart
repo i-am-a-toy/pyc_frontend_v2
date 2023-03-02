@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 abstract class INoticeCommentProvider {
   // C
-  Future<Response> comment(String comment);
+  Future<Response> comment(int noticeId, String comment);
 
   // R
   Future<Response> findById(int id);

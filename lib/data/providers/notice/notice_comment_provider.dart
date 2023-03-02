@@ -9,10 +9,10 @@ class NoticeCommentProvider implements INoticeCommentProvider {
   NoticeCommentProvider(this.client);
 
   @override
-  Future<Response> comment(String comment) async {
+  Future<Response> comment(int noticeId, String comment) async {
     final authClient = await client.getAuthClient();
     return authClient.post(
-      '/notice-comments',
+      '/notice-comments/notices/$noticeId',
       data: CreateNoticeCommentRequest(comment).toJSON(),
     );
   }
@@ -21,7 +21,7 @@ class NoticeCommentProvider implements INoticeCommentProvider {
   Future<Response> findAllByNoticeId(int noticeId, {int offset = 0, int limit = 20}) async {
     final authClient = await client.getAuthClient();
     return authClient.get(
-      '/notices/$noticeId',
+      '/notice-comments/notices/$noticeId',
       queryParameters: {"offset": offset, "limit": limit},
     );
   }

@@ -12,7 +12,7 @@ extension DateTimeExtension on DateTime {
     if (DateUtils.isSameDay(today, target)) return '오늘';
 
     final Duration duration = today.difference(target);
-    return duration.inDays > 2 ? '${duration.inDays}일전' : DateFormat('yyyy-MM-dd').format(this);
+    return duration.inDays < 2 ? '${duration.inDays}일전' : DateFormat('yyyy-MM-dd HH:mm').format(this);
   }
 
   /// dateOnly

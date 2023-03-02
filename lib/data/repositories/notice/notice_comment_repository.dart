@@ -8,8 +8,8 @@ class NoticeCommentRepository implements INoticeCommentRepository {
   NoticeCommentRepository(this.provider);
 
   @override
-  Future<NoticeCommentResponse> comment(String comment) async {
-    final response = await provider.comment(comment);
+  Future<NoticeCommentResponse> comment(int noticeId, String comment) async {
+    final response = await provider.comment(noticeId, comment);
     return NoticeCommentResponse.fromJSON(response.data);
   }
 

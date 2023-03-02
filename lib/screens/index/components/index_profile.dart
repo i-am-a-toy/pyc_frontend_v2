@@ -20,55 +20,52 @@ class IndexProfile extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(color: Colors.white),
       width: double.infinity,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: kDefaultValue),
-        child: Column(
-          children: [
-            kHeightSizeBox,
-            SizedBox(
-              width: double.infinity,
-              height: 120.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      DefaultRoundedLabel(label: role),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          kHalfHeightSizeBox,
-                          const Text(
-                            '안녕하세요!',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 30.0,
-                            ),
+      child: Column(
+        children: [
+          kHeightSizeBox,
+          SizedBox(
+            width: double.infinity,
+            height: 120.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    DefaultRoundedLabel(label: role),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        kHalfHeightSizeBox,
+                        const Text(
+                          '안녕하세요!',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 30.0,
                           ),
-                          Text(
-                            '$name님',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30.0,
-                            ),
+                        ),
+                        Text(
+                          '$name님',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30.0,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  CircleAvatar(
-                    backgroundColor: kSecondaryColor,
-                    backgroundImage: NetworkImage(image),
-                    maxRadius: 60.0,
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                CircleAvatar(
+                  backgroundColor: kSecondaryColor,
+                  backgroundImage: NetworkImage(image),
+                  maxRadius: 60.0,
+                )
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
@@ -79,8 +76,7 @@ class ShimmerIndexUserProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: kDefaultValue),
+    return SizedBox(
       width: double.infinity,
       height: 120,
       child: Shimmer.fromColors(

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pyc/common/constants/constants.dart';
 import 'package:pyc/controllers/index/fetch_me_controller.dart';
 import 'package:pyc/screens/index/components/index_drawer_list_title.dart';
+import 'package:pyc/screens/notice/notice_screen.dart';
 
 class IndexDrawer extends StatelessWidget {
   final Size size;
@@ -77,7 +78,10 @@ class IndexDrawer extends StatelessWidget {
               IndexDrawerListTitle(
                 icon: 'assets/icons/drawer_notice.png',
                 title: '공지사항',
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Get.toNamed(NoticeScreen.routeName);
+                },
               ),
               kQuarterHeightSizedBox,
               IndexDrawerListTitle(

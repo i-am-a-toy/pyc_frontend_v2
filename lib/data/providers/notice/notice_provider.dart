@@ -34,7 +34,7 @@ class NoticeProvider implements INoticeProvider {
   @override
   Future<void> modify(int id, String title, String content) async {
     final authClient = await client.getAuthClient();
-    await authClient.post(
+    await authClient.put(
       '/notices/$id',
       data: CreateNoticeRequest(title, content).toJSON(),
     );

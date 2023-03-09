@@ -14,6 +14,7 @@ import 'package:pyc/screens/components/button/default_text_button.dart';
 import 'package:pyc/screens/components/dialog/default_dialog.dart';
 import 'package:pyc/screens/components/input/default_border_input_field.dart';
 import 'package:pyc/screens/components/spacer/default_spacer.dart';
+import 'package:pyc/screens/notice/notice_comment_modify_screen.dart';
 import 'package:pyc/screens/notice/notice_modify_screen.dart';
 
 class NoticeDetailScreen extends StatelessWidget {
@@ -24,6 +25,7 @@ class NoticeDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final noticeDetailController = Get.find<NoticeDetailController>();
     final int id = Get.arguments['id'];
     final bool autoFocus = Get.arguments['autoFocus'] ?? false;
 
@@ -31,30 +33,42 @@ class NoticeDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Notice'),
         backgroundColor: kPrimaryColor,
-        actions: [
-          // TODO:  수정 이벤트 달기
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.close_outlined),
-            onPressed: () => showDefaultDialog(
-              context: context,
-              dialogType: DialogType.question,
-              title: 'Question',
-              desc: '공지사항을 삭제하시겠습니까?',
-              onPressed: () async {
-                Navigator.of(context).pop();
-                Get.find<NoticeDetailController>().deleteById();
-              },
-            ),
-          ),
-        ],
+        // Notice modify & delete permission only manager
+        actions: Get.find<FetchMeController>().myProfile.role.isManager()
+            ? [
+                // Notice Modify
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () async {
+                    // Detail refetch & go modify screen
+                    await noticeDetailController.refetch();
+                    Get.toNamed(NoticeModifyScreen.routeName, arguments: {
+                      "id": noticeDetailController.notice.id,
+                      "title": noticeDetailController.notice.title,
+                      "content": noticeDetailController.notice.content,
+                    });
+                  },
+                ),
+                // Notice Delete
+                IconButton(
+                  icon: const Icon(Icons.close_outlined),
+                  onPressed: () => showDefaultDialog(
+                    context: context,
+                    dialogType: DialogType.question,
+                    title: 'Question',
+                    desc: '공지사항을 삭제하시겠습니까?',
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      Get.find<NoticeDetailController>().deleteById();
+                    },
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: kDefaultValue),
-        child: GestureDetector(
+        child: InkWell(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Column(
             children: [
@@ -64,66 +78,12 @@ class NoticeDetailScreen extends StatelessWidget {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Notice Header
-                      DefaultAvatarContent(
-                        avatar: const DefaultCircleAvatar(
-                          child: Icon(
-                            Icons.person_outline_outlined,
-                            size: kDefaultValue * 2,
-                            color: Colors.white,
-                          ),
-                        ),
-                        title: controller.notice.title,
-                        content: '작성자 | ${controller.notice.creator.name}',
-                        subContent: controller.notice.createdAt.getDifferenceNow(),
-                      ),
+                    children: const [
+                      _Notice(),
                       kHeightSizeBox,
-
-                      /// Notice Body
-                      Text(
-                        controller.notice.content,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 16.0,
-                        ),
-                      ),
+                      DefaultSpacer(),
                       kHeightSizeBox,
-                      const DefaultSpacer(),
-                      kHeightSizeBox,
-
-                      /// Notice Comment Count & More Button
-                      GetBuilder<NoticeCommentController>(
-                        builder: (controller) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '댓글 ${controller.isLoading ? 0 : controller.count}개',
-                              style: const TextStyle(
-                                color: kGreyTextColor,
-                                fontSize: 12.0,
-                              ),
-                            ),
-                            if (controller.hasMore) ...[
-                              kHeightSizeBox,
-                              DefaultTextButton(
-                                onTap: () async => controller.moreComment(),
-                                label: '댓글 더보기',
-                              )
-                            ]
-                          ],
-                        ),
-                      ),
-                      kHeightSizeBox,
-
-                      // Comment List
-                      GetBuilder<NoticeCommentController>(
-                        builder: (controller) => controller.isLoading
-                            ? const Text('로딩중')
-                            : NoticeCommentList(
-                                rows: controller.rows,
-                              ),
-                      ),
+                      _NoticeComment(),
                       kDoubleHeightSizeBox,
                     ],
                   );
@@ -137,6 +97,94 @@ class NoticeDetailScreen extends StatelessWidget {
         autoFocus: autoFocus,
         noticeId: id,
       ),
+    );
+  }
+}
+
+class _Notice extends StatelessWidget {
+  const _Notice();
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<NoticeDetailController>(
+      builder: (controller) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Notice Header
+          DefaultAvatarContent(
+            avatar: const DefaultCircleAvatar(
+              child: Icon(
+                Icons.person_outline_outlined,
+                size: kDefaultValue * 2,
+                color: Colors.white,
+              ),
+            ),
+            title: controller.notice.title,
+            content: '작성자 | ${controller.notice.creator.name} ',
+            subContent: controller.notice.createdAt.getDifferenceNow(),
+          ),
+          kHeightSizeBox,
+
+          /// Notice Body
+          Text(
+            controller.notice.content,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoticeComment extends StatelessWidget {
+  const _NoticeComment();
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<NoticeCommentController>(
+      builder: (controller) {
+        return controller.isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: kPrimaryColor,
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// Notice Comment Count & More Button
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '댓글 ${controller.isLoading ? 0 : controller.count}개',
+                        style: const TextStyle(
+                          color: kGreyTextColor,
+                          fontSize: 12.0,
+                        ),
+                      ),
+                      if (controller.hasMore) ...[
+                        kHeightSizeBox,
+                        DefaultTextButton(
+                          onTap: () async => controller.moreComment(),
+                          label: '댓글 더보기',
+                        )
+                      ]
+                    ],
+                  ),
+
+                  kHeightSizeBox,
+
+                  /// Comment List
+                  NoticeCommentList(
+                    rows: controller.rows,
+                  )
+                ],
+              );
+      },
     );
   }
 }
@@ -179,7 +227,7 @@ class NoticeCommentList extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.edit_note_outlined, color: kPrimaryColor),
                             onPressed: () => Get.toNamed(
-                              NoticeModifyScreen.routeName,
+                              NoticeCommentModifyScreen.routeName,
                               arguments: {
                                 'id': rows[i].id,
                                 'content': rows[i].content,

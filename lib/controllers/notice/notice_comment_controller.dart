@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -34,9 +36,11 @@ class NoticeCommentController extends GetxController {
 
   // C
   Future<void> comment(int noticeId, String comment) async {
+    const first = 0;
+
     try {
       final response = await commentRepository.comment(noticeId, comment.trim());
-      _rows.insert(0, response);
+      _rows.insert(first, response);
       _count += 1;
       update();
     } catch (e) {
@@ -65,23 +69,6 @@ class NoticeCommentController extends GetxController {
     await _fetchList();
   }
 
-  Future<void> _fetchList({int offset = 0, int limit = 20}) async {
-    try {
-      _isLoading == true ? _isLoading : true;
-      update();
-
-      final response = await commentRepository.findAllByNoticeId(id, offset: offset, limit: limit);
-      _rows = response.rows;
-      _count = response.count;
-      _hasMore = _rows.length < _count;
-
-      _isLoading = false;
-      update();
-    } catch (e) {
-      _handleError(e);
-    }
-  }
-
   // U
   Future<void> modifyComment(int id, int index, String comment) async {
     try {
@@ -98,6 +85,24 @@ class NoticeCommentController extends GetxController {
     try {
       await commentRepository.deleteById(id);
       await _fetchList();
+      update();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> _fetchList({int offset = 0, int limit = 20}) async {
+    log('Hit $id notice comment list refetch');
+    try {
+      _isLoading == true ? _isLoading : true;
+      update();
+
+      final response = await commentRepository.findAllByNoticeId(id, offset: offset, limit: limit);
+      _rows = response.rows;
+      _count = response.count;
+      _hasMore = _rows.length < _count;
+
+      _isLoading = false;
       update();
     } catch (e) {
       _handleError(e);

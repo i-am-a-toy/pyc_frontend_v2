@@ -8,6 +8,7 @@ class DefaultAvatarContent extends StatelessWidget {
   final String content;
   final String? subContent;
   final Widget? suffix;
+  final bool? overflow;
   const DefaultAvatarContent({
     super.key,
     required this.avatar,
@@ -15,6 +16,7 @@ class DefaultAvatarContent extends StatelessWidget {
     required this.content,
     required this.subContent,
     this.suffix,
+    this.overflow = false,
   });
 
   @override
@@ -45,6 +47,8 @@ class DefaultAvatarContent extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: kPrimaryColor,
                   ),
+                  maxLines: overflow! ? 2 : null,
+                  overflow: overflow! ? TextOverflow.ellipsis : null,
                 ),
                 kQuarterHeightSizedBox,
                 RichText(

@@ -1,7 +1,9 @@
+import 'package:pyc/common/enum/role.dart';
+
 class UserResponse {
   final int id;
   final String? cellId;
-  final String role;
+  final Role role;
   final String gender;
   final String rank;
   final String name;
@@ -32,7 +34,7 @@ class UserResponse {
   UserResponse.fromJSON(Map<String, dynamic> json)
       : id = json['id'],
         cellId = json['cellId'],
-        role = json['role'],
+        role = Role.getByName(json['role']),
         gender = json['gender'],
         rank = json['rank'],
         name = json['name'],
@@ -48,7 +50,7 @@ class UserResponse {
     return UserResponse(
       1,
       null,
-      'NONE',
+      Role.undefined,
       'NONE',
       'NONE',
       '',

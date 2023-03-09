@@ -45,7 +45,7 @@ class IndexScreen extends StatelessWidget {
                   : IndexProfile(
                       image: controller.myProfile.image,
                       name: controller.myProfile.name,
-                      role: controller.myProfile.role,
+                      role: controller.myProfile.role.displayName,
                     ),
             ),
             kHeightSizeBox,
@@ -64,31 +64,37 @@ class IndexNoticeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<NoticeController>(
-      builder: (controller) => LabeledContent(
-        onTap: () => Get.toNamed(NoticeScreen.routeName),
+    return GetBuilder<NoticeController>(builder: (controller) {
+      const int rangeLimit = 3;
+      final int range = controller.rows.length < rangeLimit ? controller.rows.length : rangeLimit;
+
+      return LabeledContent(
+        onTap: () async {
+          await controller.refetch();
+          Get.toNamed(NoticeScreen.routeName);
+        },
         label: '공지사항',
-        content: controller.isLoading
+        content: controller.count == 0 || controller.isLoading
             ? const IndexContent(
                 icon: Icons.campaign_outlined,
                 content: '등록된 공지사항이 없습니다.',
+                subContent: '공지사항을 등록해주세요.',
               )
             : Column(
                 children: [
-                  ...controller.rows.map(
-                    (e) => IndexContent(
+                  for (int i = 0; i < range; i++)
+                    IndexContent(
                       icon: Icons.campaign_outlined,
-                      content: e.title,
-                      subContent: '작성자 | ${e.creator.name} - ${e.createdAt.getDifferenceNow()}',
+                      content: controller.rows[i].title,
+                      subContent: '작성자 | ${controller.rows[i].creator.name} - ${controller.rows[i].createdAt.getDifferenceNow()}',
                       onTap: () => Get.toNamed(
                         NoticeDetailScreen.routeName,
-                        arguments: {'id': e.id},
+                        arguments: {'id': controller.rows[i].id},
                       ),
                     ),
-                  ),
                 ],
               ),
-      ),
-    );
+      );
+    });
   }
 }

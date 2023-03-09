@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,7 +7,6 @@ import 'package:pyc/common/utils/get_snackbar.dart';
 import 'package:pyc/controllers/notice/notice_controller.dart';
 import 'package:pyc/data/models/notice/responses/notice_response.dart';
 import 'package:pyc/data/repositories/notice/notice_repository_interface.dart';
-import 'package:pyc/screens/notice/notice_screen.dart';
 
 class NoticeDetailController extends GetxController {
   final INoticeRepository noticeRepository;
@@ -18,15 +19,22 @@ class NoticeDetailController extends GetxController {
   // STATE
   bool _isLoading = true;
 
+  NoticeResponse get notice => _notice;
+  bool get isLoading => _isLoading;
+
   @mustCallSuper
   @override
   void onInit() async {
     super.onInit();
+    await _fetch();
+  }
 
+  Future<void> modify(int id, String title, String content) async {
     try {
-      _notice = await noticeRepository.findById(id);
-      _isLoading = false;
-      update();
+      await noticeRepository.modify(id, title, content);
+      await refetch();
+      Get.back();
+      showGetXSnackBar('알림', '공지사항이 수정되었습니다.');
     } catch (e) {
       _handleError(e);
     }
@@ -35,8 +43,26 @@ class NoticeDetailController extends GetxController {
   Future<void> deleteById() async {
     try {
       await noticeRepository.deleteById(id);
-      Get.offAndToNamed(NoticeScreen.routeName);
+      Get.back();
       showGetXSnackBar('알림', '공지사항이 삭제되었습니다');
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> refetch() async {
+    await _fetch();
+  }
+
+  Future<void> _fetch() async {
+    try {
+      log('Hit NoticeDetail with $id');
+      _isLoading = true;
+      update();
+
+      _notice = await noticeRepository.findById(id);
+      _isLoading = false;
+      update();
     } catch (e) {
       _handleError(e);
     }
@@ -46,6 +72,7 @@ class NoticeDetailController extends GetxController {
   @mustCallSuper
   void onClose() async {
     super.onClose();
+    log('NoticeDetail screen deleted & refetch notice list');
     await Get.find<NoticeController>().refetch();
   }
 
@@ -62,7 +89,4 @@ class NoticeDetailController extends GetxController {
     // Internal Service Error or Flutter Error
     showGetXSnackBar('요청 실패', '서버에 문제가 있습니다.\n관리자에게 문의해주세요.');
   }
-
-  NoticeResponse get notice => _notice;
-  bool get isLoading => _isLoading;
 }

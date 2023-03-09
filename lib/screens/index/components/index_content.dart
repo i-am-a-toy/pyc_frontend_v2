@@ -26,7 +26,6 @@ class IndexContent extends StatelessWidget {
         color: kSecondaryColor,
         borderRadius: BorderRadius.circular(kDefaultValue),
       ),
-      // TODO: 같은 형식 공통코드 분리
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

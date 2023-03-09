@@ -28,6 +28,9 @@ class MyApp extends StatelessWidget {
       title: 'PYC',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        /// splashColor, highlightColor: Remove Inkwell, Button Effect
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         backgroundColor: Colors.white,
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(

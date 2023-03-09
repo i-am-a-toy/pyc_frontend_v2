@@ -12,27 +12,11 @@ class IndexBinding extends Bindings {
   @override
   void dependencies() {
     final client = DioClient();
-    final userRepository = Get.put<UserRepository>(
-      UserRepository(
-        UserProvider(client),
-      ),
-    );
     final authRepository = Get.find<AuthRepository>();
+    final userRepository = Get.put<UserRepository>(UserRepository(UserProvider(client)));
+    final noticeRepository = Get.put<NoticeRepository>(NoticeRepository(NoticeProvider(client)));
 
-    Get.put<FetchMeController>(FetchMeController(
-      userRepository,
-      authRepository,
-    ));
-
-    final noticeRepository = Get.put<NoticeRepository>(
-      NoticeRepository(
-        NoticeProvider(client),
-      ),
-    );
-    Get.put<NoticeController>(
-      NoticeController(
-        noticeRepository,
-      ),
-    );
+    Get.put<FetchMeController>(FetchMeController(userRepository, authRepository));
+    Get.put<NoticeController>(NoticeController(noticeRepository));
   }
 }

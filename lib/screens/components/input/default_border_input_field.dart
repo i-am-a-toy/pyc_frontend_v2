@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pyc/common/constants/constants.dart';
 
 class DefaultBorderInputField extends StatelessWidget {
@@ -12,6 +11,7 @@ class DefaultBorderInputField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? initialValue;
+  final String? hintText;
 
   const DefaultBorderInputField({
     super.key,
@@ -24,6 +24,7 @@ class DefaultBorderInputField extends StatelessWidget {
     this.maxLine,
     this.prefixIcon,
     this.suffixIcon,
+    this.hintText,
   });
 
   @override
@@ -42,7 +43,7 @@ class DefaultBorderInputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(isRounded! ? 40 : kDefaultValue / 2),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: kGreyTextColor, width: 2.0),
+          borderSide: const BorderSide(color: kGreyBorderColor, width: 2.0),
           borderRadius: BorderRadius.circular(isRounded! ? 40 : kDefaultValue / 2),
         ),
         errorBorder: OutlineInputBorder(
@@ -55,6 +56,7 @@ class DefaultBorderInputField extends StatelessWidget {
         ),
         isDense: true,
         hintStyle: const TextStyle(fontSize: 14.0),
+        hintText: hintText,
         counterText: '',
       ),
       onSaved: onSaved,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:pyc/common/constants/constants.dart';
 import 'package:pyc/screens/route.dart';
 import 'package:pyc/screens/splash/splash_screen.dart';
@@ -14,7 +15,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
+  initializeDateFormatting().then((_) => runApp(const MyApp()));
   runApp(const MyApp());
 }
 

@@ -4,6 +4,7 @@ import 'package:pyc/common/constants/constants.dart';
 import 'package:pyc/controllers/index/fetch_me_controller.dart';
 import 'package:pyc/controllers/notice/notice_controller.dart';
 import 'package:pyc/extension/datetime.dart';
+import 'package:pyc/screens/calendar/calendar_screen.dart';
 import 'package:pyc/screens/components/layout/labeled_content.dart';
 import 'package:pyc/screens/index/components/index_content.dart';
 import 'package:pyc/screens/index/components/index_drawer.dart';
@@ -49,7 +50,9 @@ class IndexScreen extends StatelessWidget {
                     ),
             ),
             kHeightSizeBox,
-            const IndexNoticeList(),
+            const _IndexNoticeList(),
+            kHeightSizeBox,
+            const _IndexCalendarList(),
           ],
         ),
       ),
@@ -57,8 +60,26 @@ class IndexScreen extends StatelessWidget {
   }
 }
 
-class IndexNoticeList extends StatelessWidget {
-  const IndexNoticeList({
+class _IndexCalendarList extends StatelessWidget {
+  const _IndexCalendarList({
+    Key? key,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return LabeledContent(
+      label: '일정',
+      onTap: () => Get.toNamed(CalendarScreen.routeName),
+      content: const IndexContent(
+        icon: Icons.calendar_month_outlined,
+        content: '이번 주 일정이 없습니다.',
+        subContent: '일정을 등록해주세요.',
+      ),
+    );
+  }
+}
+
+class _IndexNoticeList extends StatelessWidget {
+  const _IndexNoticeList({
     Key? key,
   }) : super(key: key);
 

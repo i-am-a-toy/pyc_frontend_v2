@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pyc/controllers/calendar/calendar_controller.dart';
 import 'package:pyc/controllers/index/fetch_me_controller.dart';
 import 'package:pyc/controllers/notice/notice_controller.dart';
 import 'package:pyc/data/clients/client.dart';
@@ -18,5 +19,6 @@ class IndexBinding extends Bindings {
 
     Get.put<FetchMeController>(FetchMeController(userRepository, authRepository));
     Get.put<NoticeController>(NoticeController(noticeRepository));
+    Get.put<CalendarController>(CalendarController());
   }
 }

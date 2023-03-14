@@ -21,4 +21,12 @@ extension DateTimeExtension on DateTime {
   DateTime dateOnly() {
     return DateTime(year, month, day);
   }
+
+  /// isAfterOrEqualTo
+  ///
+  /// 시간이 인자로 받은 시간과 동일하거나 이후인지 비교해주는 method
+  bool isAfterOrEqualTo(DateTime dateTime) {
+    final isAtSameMomentAs = dateTime.isAtSameMomentAs(this);
+    return isAtSameMomentAs | isAfter(dateTime);
+  }
 }

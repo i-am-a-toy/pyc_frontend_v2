@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pyc/binding/calendar_binding.dart';
 import 'package:pyc/binding/index_binding.dart';
 import 'package:pyc/binding/login_binding.dart';
 import 'package:pyc/binding/notice_detail_binding.dart';
@@ -35,6 +36,7 @@ List<GetPage> routes = [
     GetPage(
       name: CalendarScreen.routeName,
       page: () => const CalendarScreen(),
+      binding: CalendarBinding(),
     ),
   ],
   // Notice Screen

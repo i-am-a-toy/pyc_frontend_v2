@@ -2,73 +2,129 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pyc/common/constants/constants.dart';
-import 'package:pyc/common/validators/form/form_validator.dart';
 import 'package:pyc/controllers/calendar/calendar_controller.dart';
+import 'package:pyc/data/models/calendar/responses/calendar_response.dart';
 import 'package:pyc/extension/datetime.dart';
-import 'package:pyc/screens/calendar/components/date_form_field.dart';
-import 'package:pyc/screens/components/input/default_border_input_field.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:pyc/screens/calendar/components/bottom_modal_sheet.dart';
+import 'package:pyc/screens/components/avatar/default_avatar_content.dart';
+import 'package:pyc/screens/components/avatar/default_circle_avatar.dart';
+import 'package:pyc/screens/components/calendar/default_table_calendar.dart';
 
-class CalendarScreen extends StatelessWidget {
+/// CalendarScreen
+///
+/// * @description: CalendarScreen이 StatefulWidget인 이유는 LifeCycle을 이용하기 위함.
+/// * Index에서 Calendar로 넘어올 때 CalendarScreen의 BuildContext를 이용하기 위해서
+/// * GetX Argument로 isDetail과 Data가 넘어오면 해당 Data를 이용하여 BottomModalSheet를 띄운다.
+class CalendarScreen extends StatefulWidget {
   static const routeName = '/calendars';
   const CalendarScreen({super.key});
 
   @override
+  State<CalendarScreen> createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends State<CalendarScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      bool? isDetail = Get.arguments?['isDetail'];
+      CalendarResponse? data = Get.arguments?['data'];
+
+      /// * isDeTail이 존재하고 isDetail이 True일 경우에만 BottomModalSheet를 통해 Detail을 보여준다.
+      if (isDetail != null && isDetail) {
+        Get.find<CalendarController>().openDetailBottomSheet(context, isDetail, data!);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final DateTime firstDay = DateTime(2022, 1, 1);
-    final DateTime lastDay = DateTime(2099, 12, 31);
-    const String locale = 'ko-KR';
+    final CalendarController calendarController = Get.find<CalendarController>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendar'),
         actions: [
           IconButton(
-            onPressed: () => _getBottomModal(context),
-            icon: const Icon(
-              CupertinoIcons.calendar_badge_plus,
-              size: kDefaultValue * 1.5,
-            ),
+            onPressed: () {
+              getBottomModal(
+                context: context,
+                isDetail: false,
+                onCloseTap: () => Navigator.of(context).pop(),
+                onRegisterTap: calendarController.registerCalendar,
+              );
+            },
+            icon: const Icon(CupertinoIcons.calendar_badge_plus),
           )
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: kDefaultValue),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kDefaultValue,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            kHeightSizeBox,
+            kHalfHeightSizeBox,
             GetBuilder<CalendarController>(
-              builder: (controller) => TableCalendar(
-                onDaySelected: controller.onDaySelected,
-                selectedDayPredicate: (day) => isSameDay(controller.selectedDay, day),
-                onPageChanged: controller.onPageChanged,
-                onFormatChanged: controller.onFormatChanged,
-                // settings
-                availableGestures: AvailableGestures.none, // for Scroll
-                locale: locale,
-                firstDay: firstDay,
-                lastDay: lastDay,
+              builder: (controller) => DefaultTableCalendar(
+                locale: 'ko-KR',
+                firstDay: DateTime(2022, 1, 1),
+                lastDay: DateTime(2099, 12, 31),
                 focusedDay: controller.focusedDay,
-                calendarFormat: controller.format,
-
-                /// style
-                /// days height
-                daysOfWeekHeight: kDefaultValue * 2,
-
-                /// Header
-                headerStyle: getCalendarHeaderStyle(),
-
-                /// Calendar
-                calendarStyle: getCalendarStyle(),
-
-                /// Calendar Builder
-                calendarBuilders: CalendarBuilders(
-                  dowBuilder: getDowBuilder,
-                  markerBuilder: getMarkerBuilder,
-                  selectedBuilder: getSelectedBuilder,
-                  todayBuilder: getTodayBuilder,
+                selectedDay: controller.selectedDay,
+                onDaySelected: controller.onDaySelected,
+                onFormatChanged: controller.onFormatChanged,
+                calendarFormat: controller.calendarFormat,
+                onPageChanged: controller.onPageChanged,
+                eventLoader: controller.getEventsForDay,
+              ),
+            ),
+            kDoubleHeightSizeBox,
+            const Text(
+              'Events',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                color: kPrimaryColor,
+              ),
+            ),
+            kHeightSizeBox,
+            Expanded(
+              child: GetBuilder<CalendarController>(
+                builder: (controller) => ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: controller.scrollController,
+                  shrinkWrap: true,
+                  itemCount: controller.dateRows.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index < controller.dateRows.length) {
+                      return Column(
+                        children: [
+                          CalendarCard(
+                            onTap: () {},
+                            title: controller.dateRows[index].title,
+                            content: controller.dateRows[index].content,
+                            subContext: controller.dateRows[index].isAllDay
+                                ? '\n${controller.dateRows[index].start.toMMDD()} ~ ${controller.dateRows[index].end.toMMDD()}'
+                                : '\n${controller.dateRows[index].start.toMMDDHHmm()} ~ ${controller.dateRows[index].end.toMMDDHHmm()}',
+                          ),
+                          if (controller.dateRows.length > index) kHeightSizeBox,
+                        ],
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: kDefaultValue,
+                        ),
+                        child: CalendarDateListNoContent(
+                          content: controller.dateHasMore ? '' : '추가적인 일정이 없습니다.',
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
             ),
@@ -77,312 +133,85 @@ class CalendarScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  _getBottomModal(BuildContext context) {
-    // Bottom Modal Sheet
-    GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
+class CalendarCard extends StatelessWidget {
+  final String title;
+  final String content;
+  final String? subContext;
+  final VoidCallback onTap;
 
-      /// Border Shape
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(25.0),
-        ),
+  const CalendarCard({
+    super.key,
+    required this.title,
+    required this.content,
+    required this.onTap,
+    this.subContext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80.0),
+      decoration: BoxDecoration(
+        color: kSecondaryColor,
+        borderRadius: BorderRadius.circular(kDefaultValue),
       ),
-
-      builder: (context) {
-        return Form(
-          key: formKey,
-          child: InkWell(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: SizedBox(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.75,
-              child: GetBuilder<CalendarController>(
-                builder: (controller) => SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    kDefaultValue,
-                    kDefaultValue,
-                    kDefaultValue,
-                    MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(
-                              CupertinoIcons.clear_circled,
-                              color: kPrimaryColor,
-                              size: kDefaultValue * 1.5,
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () async {},
-                            icon: const Icon(
-                              CupertinoIcons.check_mark_circled,
-                              color: kPrimaryColor,
-                              size: kDefaultValue * 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      kDoubleHeightSizeBox,
-                      const Text(
-                        'Title',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      kHalfHeightSizeBox,
-                      DefaultBorderInputField(
-                        maxLine: 2,
-                        maxLength: 200,
-                        autoFocus: true,
-                        hintText: 'Please enter a title...',
-                        onSaved: (val) {},
-                        validate: requiredStringValidator,
-                      ),
-                      kHeightSizeBox,
-                      const Text(
-                        'Content',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      kHalfHeightSizeBox,
-                      DefaultBorderInputField(
-                        maxLine: 5,
-                        hintText: 'Please enter a content...',
-                        onSaved: (val) {},
-                        validate: requiredStringValidator,
-                      ),
-                      kHeightSizeBox,
-
-                      /// isAllDay switch
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'All Day',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Switch(
-                            value: controller.isAllDay,
-                            onChanged: controller.toggleIsAllDay,
-                            activeColor: kPrimaryColor,
-                          ),
-                        ],
-                      ),
-                      kHeightSizeBox,
-                      DateFormFiled(
-                        context: context,
-                        onConfirm: controller.onConfirmStart,
-                        initialValue: controller.start,
-                        isAllDay: controller.isAllDay,
-                        title: '시작',
-                      ),
-                      kHeightSizeBox,
-                      DateFormFiled(
-                        context: context,
-                        minTime: controller.start,
-                        onConfirm: controller.onConfirmEnd,
-                        initialValue: controller.end,
-                        isAllDay: controller.isAllDay,
-                        title: '종료',
-                        validator: (value) => controller.end.isAfterOrEqualTo(value!) ? null : '종료는 시작과 같거나 이 후 시점이여야 합니다.',
-                      ),
-                    ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: kDefaultValue),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: DefaultAvatarContent(
+                avatar: const DefaultCircleAvatar(
+                  child: Icon(CupertinoIcons.calendar, color: Colors.white, size: kDefaultValue * 1.5),
+                ),
+                title: title,
+                content: content,
+                overflow: true,
+                subContent: subContext,
+                suffix: GestureDetector(
+                  onTap: onTap,
+                  child: const Icon(
+                    Icons.keyboard_arrow_right_outlined,
+                    size: kDefaultValue * 2,
+                    color: kPrimaryColor,
                   ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    ).whenComplete(
-      () => Get.find<CalendarController>().resetBottomSheet(),
-    );
-  }
-
-  Widget? getTodayBuilder(
-    BuildContext context,
-    DateTime day,
-    DateTime focusedDay,
-  ) {
-    return Container(
-      width: kDefaultValue * 2,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.amber.shade700,
-        shape: BoxShape.circle,
-      ),
-      child: Text(
-        day.day.toString(),
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget? getSelectedBuilder(
-    BuildContext context,
-    DateTime day,
-    DateTime focusedDay,
-  ) {
-    return Container(
-      width: kDefaultValue * 2,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: kPrimaryColor,
-        shape: BoxShape.circle,
-      ),
-      child: Text(
-        day.day.toString(),
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
+class CalendarDateListNoContent extends StatelessWidget {
+  final String content;
 
-  Widget? getMarkerBuilder(
-    BuildContext context,
-    DateTime day,
-    List<Object?> events,
-  ) {
-    return events.isNotEmpty
-        ? Container(
-            width: kDefaultValue / 2,
-            height: kDefaultValue / 2,
-            decoration: const BoxDecoration(
-              color: kPrimaryColor,
-              shape: BoxShape.circle,
-            ),
-          )
-        : null;
-  }
+  const CalendarDateListNoContent({
+    super.key,
+    required this.content,
+  });
 
-  Widget? getDowBuilder(BuildContext context, DateTime day) {
-    switch (day.weekday) {
-      case DateTime.monday:
-        return const Center(
-          child: Text('월'),
-        );
-      case DateTime.tuesday:
-        return const Center(
-          child: Text('화'),
-        );
-      case DateTime.wednesday:
-        return const Center(
-          child: Text('수'),
-        );
-      case DateTime.thursday:
-        return const Center(
-          child: Text('목'),
-        );
-      case DateTime.friday:
-        return const Center(
-          child: Text('금'),
-        );
-      case DateTime.saturday:
-        return const Center(
-          child: Text(
-            '토',
-            style: TextStyle(
-              color: kPrimaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        );
-      default:
-        return const Center(
-          child: Text(
-            '일',
-            style: TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        );
-    }
-  }
-
-  CalendarStyle getCalendarStyle() {
-    return CalendarStyle(
-      isTodayHighlighted: true,
-      selectedDecoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: kPrimaryColor,
-      ),
-      defaultTextStyle: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-      ),
-      markersAlignment: Alignment.bottomCenter,
-      canMarkersOverflow: false,
-      holidayTextStyle: TextStyle(color: Colors.red.shade700),
-    );
-  }
-
-  HeaderStyle getCalendarHeaderStyle() {
-    return HeaderStyle(
-      /// format button
-      formatButtonVisible: true,
-      formatButtonDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kDefaultValue),
-        color: Colors.amber.shade700,
-        border: Border.all(
-          color: Colors.amber.shade700,
-          width: 2.0,
-        ),
-      ),
-      formatButtonShowsNext: false,
-      formatButtonTextStyle: const TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 14.0,
-      ),
-
-      /// title
-      titleTextStyle: const TextStyle(
-        color: kPrimaryColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 16.0,
-      ),
-
-      /// chevron Button
-      leftChevronIcon: const Icon(
-        Icons.chevron_left_outlined,
-        color: kPrimaryColor,
-        size: kDefaultValue * 2,
-      ),
-      rightChevronIcon: const Icon(
-        Icons.chevron_right_outlined,
-        color: kPrimaryColor,
-        size: kDefaultValue * 2,
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<CalendarController>(
+      builder: (controller) => Center(
+        child: controller.dateHasMore
+            ? const CircularProgressIndicator(
+                color: kPrimaryColor,
+              )
+            : Text(
+                content,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: kPrimaryColor,
+                  fontSize: 14.0,
+                ),
+              ),
       ),
     );
   }

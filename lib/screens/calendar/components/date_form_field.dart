@@ -30,20 +30,7 @@ class DateFormFiled extends FormField<DateTime> {
                       currentTime: initialValue,
                       minTime: minTime,
                       maxTime: maxTime,
-                      theme: DatePickerTheme(
-                        itemStyle: const TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        doneStyle: const TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        cancelStyle: TextStyle(
-                          color: Colors.red.shade700,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      theme: _getTheme(),
                     )
                   : DatePicker.showDateTimePicker(
                       context,
@@ -52,20 +39,7 @@ class DateFormFiled extends FormField<DateTime> {
                       onConfirm: onConfirm,
                       minTime: minTime,
                       maxTime: maxTime,
-                      theme: DatePickerTheme(
-                        itemStyle: const TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        doneStyle: const TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        cancelStyle: TextStyle(
-                          color: Colors.red.shade700,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      theme: _getTheme(),
                     ),
               child: SizedBox(
                 child: Column(
@@ -119,4 +93,20 @@ class DateFormFiled extends FormField<DateTime> {
             );
           },
         );
+
+  static DatePickerTheme _getTheme() {
+    return DatePickerTheme(
+      itemStyle: const TextStyle(
+        color: kPrimaryColor,
+      ),
+      doneStyle: const TextStyle(
+        color: kPrimaryColor,
+        fontWeight: FontWeight.bold,
+      ),
+      cancelStyle: TextStyle(
+        color: Colors.red.shade700,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
 }

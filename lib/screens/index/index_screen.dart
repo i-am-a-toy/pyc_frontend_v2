@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pyc/common/constants/constants.dart';
+import 'package:pyc/controllers/calendar/calendar_controller.dart';
+import 'package:pyc/controllers/calendar/index_calendar_controller.dart';
 import 'package:pyc/controllers/index/fetch_me_controller.dart';
 import 'package:pyc/controllers/notice/notice_controller.dart';
 import 'package:pyc/extension/datetime.dart';
 import 'package:pyc/screens/calendar/calendar_screen.dart';
+import 'package:pyc/screens/calendar/components/bottom_modal_sheet.dart';
 import 'package:pyc/screens/components/layout/labeled_content.dart';
 import 'package:pyc/screens/index/components/index_content.dart';
 import 'package:pyc/screens/index/components/index_drawer.dart';
@@ -66,14 +70,43 @@ class _IndexCalendarList extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return LabeledContent(
-      label: '일정',
-      onTap: () => Get.toNamed(CalendarScreen.routeName),
-      content: const IndexContent(
-        icon: Icons.calendar_month_outlined,
-        content: '이번 주 일정이 없습니다.',
-        subContent: '일정을 등록해주세요.',
-      ),
+    return GetBuilder<IndexCalendarController>(
+      builder: (controller) {
+        const int rangeLimit = 3;
+        final int range = controller.rows.length < rangeLimit ? controller.rows.length : rangeLimit;
+
+        return LabeledContent(
+          onTap: () async {
+            Get.toNamed(CalendarScreen.routeName);
+          },
+          label: '일정',
+          content: controller.count == 0 || controller.isLoading
+              ? const IndexContent(
+                  icon: CupertinoIcons.calendar,
+                  content: '이번 주 일정이 없습니다.',
+                  subContent: '일정을 등록해주세요.',
+                )
+              : Column(
+                  children: [
+                    for (int i = 0; i < range; i++)
+                      IndexContent(
+                        icon: CupertinoIcons.calendar,
+                        content: controller.rows[i].title,
+                        subContent: '작성자 | ${controller.rows[i].creator.name} - ${controller.rows[i].createdAt.getDifferenceNow()}',
+                        onTap: () {
+                          Get.toNamed(
+                            CalendarScreen.routeName,
+                            arguments: {
+                              'isDetail': true,
+                              'data': controller.rows[i],
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
+        );
+      },
     );
   }
 }

@@ -14,7 +14,7 @@ import 'package:pyc/data/repositories/user/user_repository.dart';
 class IndexBinding extends Bindings {
   @override
   void dependencies() {
-    final client = DioClient();
+    final client = Get.put<DioClient>(DioClient());
     final authRepository = Get.find<AuthRepository>();
     final userRepository = Get.put<UserRepository>(UserRepository(UserProvider(client)));
     final noticeRepository = Get.put<NoticeRepository>(NoticeRepository(NoticeProvider(client)));

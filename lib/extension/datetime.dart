@@ -29,4 +29,32 @@ extension DateTimeExtension on DateTime {
     final isAtSameMomentAs = dateTime.isAtSameMomentAs(this);
     return isAtSameMomentAs | isAfter(dateTime);
   }
+
+  DateTime getStartOfWeek() {
+    return dateOnly().subtract(Duration(days: weekday));
+  }
+
+  DateTime getEndOfWeek() {
+    return dateOnly().add(Duration(days: DateTime.daysPerWeek - weekday));
+  }
+
+  String toYYYYMMDD() {
+    return DateFormat('yyyy-MM-dd').format(this);
+  }
+
+  String toYYMMDD() {
+    return DateFormat('yy-MM-dd').format(this);
+  }
+
+  String toHHmm() {
+    return DateFormat('HH:mm').format(this);
+  }
+
+  String toMMDDHHmm() {
+    return DateFormat('MM-dd HH:mm').format(this);
+  }
+
+  String toMMDD() {
+    return DateFormat('MM-dd').format(this);
+  }
 }

@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:pyc/binding/calendar_binding.dart';
 import 'package:pyc/binding/index_binding.dart';
 import 'package:pyc/binding/login_binding.dart';
 import 'package:pyc/binding/notice_detail_binding.dart';
+import 'package:pyc/screens/calendar/calendar_screen.dart';
 import 'package:pyc/screens/index/index_screen.dart';
 import 'package:pyc/screens/login/login_screen.dart';
 import 'package:pyc/screens/notice/notice_comment_modify_screen.dart';
@@ -29,6 +31,14 @@ List<GetPage> routes = [
     page: () => const IndexScreen(),
     binding: IndexBinding(),
   ),
+  // Calendar Screen
+  ...[
+    GetPage(
+      name: CalendarScreen.routeName,
+      page: () => const CalendarScreen(),
+      binding: CalendarBinding(),
+    ),
+  ],
   // Notice Screen
   ...[
     GetPage(

@@ -76,14 +76,15 @@ class IndexContent extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: onTap,
-            child: const Icon(
-              Icons.keyboard_arrow_right_outlined,
-              size: kDefaultValue * 2,
-              color: kPrimaryColor,
+          if (onTap != null)
+            GestureDetector(
+              onTap: onTap,
+              child: const Icon(
+                Icons.keyboard_arrow_right_outlined,
+                size: kDefaultValue * 2,
+                color: kPrimaryColor,
+              ),
             ),
-          ),
         ],
       ),
     );

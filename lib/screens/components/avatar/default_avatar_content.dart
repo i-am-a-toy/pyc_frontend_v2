@@ -14,7 +14,7 @@ class DefaultAvatarContent extends StatelessWidget {
     required this.avatar,
     required this.title,
     required this.content,
-    required this.subContent,
+    this.subContent,
     this.suffix,
     this.overflow = false,
   });
@@ -27,13 +27,7 @@ class DefaultAvatarContent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const DefaultCircleAvatar(
-            child: Icon(
-              Icons.person_outline_outlined,
-              size: kDefaultValue * 2,
-              color: Colors.white,
-            ),
-          ),
+          avatar,
           kWidthSizeBox,
           Expanded(
             child: Column(
@@ -52,6 +46,7 @@ class DefaultAvatarContent extends StatelessWidget {
                 ),
                 kQuarterHeightSizedBox,
                 RichText(
+                  overflow: overflow! ? TextOverflow.ellipsis : TextOverflow.visible,
                   text: TextSpan(
                     text: content,
                     style: const TextStyle(

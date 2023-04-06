@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         /// splashColor, highlightColor: Remove Inkwell, Button Effect
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        fontFamily: 'Pretendard',
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
           backgroundColor: kPrimaryColor,
